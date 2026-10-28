@@ -1,0 +1,39 @@
+services:
+  api:
+    build: .
+    container_name: mev-insight-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - ETH_RPC_URL=${ETH_RPC_URL:-https://eth.llamarpc.com}
+      - POLYGON_RPC_URL=${POLYGON_RPC_URL:-https://polygon-rpc.com}
+      - CHROMA_PERSIST_DIR=/app/chroma_db
+      - KNOWLEDGE_DIR=/app/knowledge
+      - LOG_LEVEL=INFO
+    volumes:
+      - chroma_data:/app/chroma_db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build: .
+    container_name: mev-insight-ui
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    command: ["streamlit", "run", "app/api/frontend.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+volumes:
+  chroma_data:
