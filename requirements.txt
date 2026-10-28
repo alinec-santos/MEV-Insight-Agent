@@ -9,7 +9,7 @@ web3>=6.15.0,<7.0.0
 tenacity>=8.3.0          # retry com backoff exponencial
 
 # ─── LLM ──────────────────────────────────────────────────────────────────────
-google-generativeai>=0.7.0
+google-genai>=1.20.0      # SDK oficial atual (google-generativeai foi descontinuado)
 
 # ─── RAG ──────────────────────────────────────────────────────────────────────
 chromadb>=0.5.0
